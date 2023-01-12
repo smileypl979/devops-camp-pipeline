@@ -12,7 +12,7 @@ pipeline {
         stage('Application repository') {
             steps {
                 echo "Cloning application repository"
-                sh 'git clone https://github.com/khaledAFS/afs-labs-student.git'
+                sh 'git clone https://github.com/smileypl979/afs-labs-student.git'
                 dir('afs-labs-student') {
                     script {
                         env.COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
