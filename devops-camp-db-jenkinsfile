@@ -2,7 +2,6 @@ pipeline {
     agent {
         label 'jenkins-agent'
     }
-    //TODO: add environment variables
     environment {
         PIPELINE_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         HARBOR_REGISTRY = 'harbor.dev.afsmtddso.com'
@@ -14,7 +13,7 @@ pipeline {
         stage('Application repository') {
             steps {
                 echo "Cloning application repository"
-                sh 'git clone https://github.com/smileypl979/devops-camp-pipeline.git'
+                sh 'git clone https://github.com/khaledAFS/afs-labs-student.git'
                 dir('afs-labs-student') {
                     script {
                         env.COMMIT_HASH = sh(script: 'git log --format=format:%h -1 --follow database/database.sql', returnStdout: true).trim()
@@ -27,8 +26,7 @@ pipeline {
                 }
             }
         }
-    }
-    stage('DB changes: true') {
+        stage('DB changes: true') {
            when {
               environment name: 'BUILD_DB', value: 'true'
            }
@@ -39,7 +37,7 @@ pipeline {
                       //TODO: build docker image & push to Harbor
                       withCredentials([usernameColonPassword(credentialsId: 'psmiley-harbor-auth', variable: 'HARBOR-AUTH')]) {
                           script {
-                              sh 'docker build -t $DB_IMAGE_NAME-$COMMIT_HASH -f ./db/Dockerfile ./afs-labs-student'
+                              docker.build('$DB_IMAGE_NAME-$COMMIT_HASH', '-f ./db/Dockerfile ./afs-labs-student')
                               docker.withRegistry('https://$HARBOR_REGISTRY', 'psmiley-harbor-auth') {
                                   sh 'docker tag $DB_IMAGE_NAME-$COMMIT_HASH $HARBOR_REGISTRY/$HARBOR_PROJECT/$DB_IMAGE_NAME:$COMMIT_HASH-$PIPELINE_HASH'
                                   sh 'docker push $HARBOR_REGISTRY/$HARBOR_PROJECT/$DB_IMAGE_NAME:$COMMIT_HASH-$PIPELINE_HASH'
@@ -71,6 +69,7 @@ pipeline {
               }
            }
         }
+    }
     post {
         cleanup {
             echo "Clean workspace"
