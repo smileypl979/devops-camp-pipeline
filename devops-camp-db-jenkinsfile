@@ -9,7 +9,6 @@ pipeline {
         DB_IMAGE_NAME = 'db'
     }
     stages {
-        //TODO: add stages to pipeline
         stage('Application repository') {
             steps {
                 echo "Cloning application repository"
@@ -34,7 +33,6 @@ pipeline {
               stage('Database docker build') {
                   steps {
                       echo "Building database image"
-                      //TODO: build docker image & push to Harbor
                       withCredentials([usernameColonPassword(credentialsId: 'psmiley-harbor-auth', variable: 'HARBOR-AUTH')]) {
                           script {
                               docker.build('$DB_IMAGE_NAME-$COMMIT_HASH', '-f ./db/Dockerfile ./afs-labs-student')
@@ -46,7 +44,6 @@ pipeline {
                       }
                   }
                   post {
-                      //TODO: clean local docker images
                       always {
                           echo "Clean local $DB_IMAGE_NAME image"
                           script {
@@ -63,7 +60,6 @@ pipeline {
               stage('Deploy') {
                   steps {
                       echo "Deployment stage"
-                      //TODO: deploy database
                       sh 'kubectl -n psmiley set image deployment/db-deployment db-deployment=$HARBOR_REGISTRY/$HARBOR_PROJECT/$DB_IMAGE_NAME:$COMMIT_HASH-$PIPELINE_HASH'
                   }
               }

@@ -9,6 +9,7 @@ pipeline {
         APP_IMAGE_NAME = 'app'
     }
     stages {
+        // adding this interesting line
         stage('Application repository') {
             steps {
                 echo "Cloning application repository"
@@ -22,6 +23,7 @@ pipeline {
         }
         stage('Application docker build') {
             steps {
+                // adding another interesting line
                 echo "Building application image"
                 withCredentials([usernameColonPassword(credentialsId: 'psmiley-harbor-auth', variable: 'HARBOR-AUTH')]) {
                     script {
